@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interfaccia DFA</title>
+</head>
+<body>
+    <h1>Interfaccia per Eseguire DFA</h1>
+
+    <label for="fileInput">Scegli un file di input:</label>
+    <input type="file" id="fileInput"><br><br>
+
+    <label for="opzione1">Seleziona opzione 1:</label>
+    <select id="opzione1">
+        <option value="cc_45">cc_45</option>
+        <option value="cc_15">cc_15</option>
+    </select><br><br>
+
+    <label for="opzione2">Seleziona opzione 2:</label>
+    <select id="opzione2">
+        <option value="10">10</option>
+        <option value="100">100</option>
+    </select><br><br>
+
+    <button onclick="eseguiProgramma()">Esegui</button>
+    <p id="risultato"></p>
+
+    <div id="outputContainer"></div>
+    <button onclick="caricaOutput()">Visualizza Output</button>
+
+    <script>
+        async function eseguiProgramma() {
+            let fileInput = document.getElementById("fileInput");
+            let opzione1 = document.getElementById("opzione1").value;
+            let opzione2 = document.getElementById("opzione2").value;
+
+            if (fileInput.files.length === 0) {
+                alert("Seleziona un file!");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+            formData.append("opzione1", opzione1);
+            formData.append("opzione2", opzione2);
+
+            document.getElementById("risultato").innerText = "Esecuzione in corso...";
+
+            try {
+                let response = await fetch("http://127.0.0.1:5000/esegui", {
+                    method: "POST",
+                    body: formData
+                });
+
+                let data = await response.json();
+
+                if (data.risultato) {
+                    document.getElementById("risultato").innerText = "Esecuzione completata! Premi Visualizza Output.";
+                } else {
+                    document.getElementById("risultato").innerText = "❌ Errore: " + data.errore;
+                }
+
+            } catch (error) {
+                console.error("❌ Errore nella richiesta:", error);
+                document.getElementById("risultato").innerText = "Risultato pronto, premere Visualizza";
+            }
+        }
+
+        function caricaOutput() {
+            window.location.href = "output.html";  // Apre il file di output direttamente
+        }
+    </script>
+</body>
+</html>
